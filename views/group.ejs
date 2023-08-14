@@ -1,0 +1,205 @@
+<%- include('layouts/header.ejs') %>
+
+<div class="contents">
+   
+ <div class="group-contents">
+    <form  method="post" action="/group" class=" form-group">
+        <div class="form-header-content">
+            <h2>Hello Group</h2>
+            <p>Silahkan isi form dibawah untuk peserta yang ingin di masukan ke dalam List Peserta</p>
+           
+        </div>
+        <label for="nama">Masukan Nama </label>
+        <input required placeholder="Nama..." class="groupInput" id="nama" name="nama" type="text">
+        <br>
+        <label for="umur">Masukan Umur </label>
+        <input required placeholder="Umur..." class="groupInput" id="umur" name="umur" type="text">
+        <br>
+        <label for="gender">Pilih Jenis Kelamin</label>
+        <select  class="groupInput" required name="gender" id="gender">
+            <option value="Pria">Pria</option>
+            <option value="Wanita">Wanita</option>
+          </select>
+        <button class="elegant-button" type="submit">Tambah Data</button>
+        <% if (typeof errors != 'undefined') { %>
+            <% errors.forEach(error => { %>
+            <div class="error-form alert alert-error">
+                
+                   
+                    <%- error.msg %>
+                   
+                
+              </div>
+              <% }) %>
+        <% } %>
+    </form>
+   
+    <div class="list-group">
+        <h2>🧍 List Peserta Yang Sudah Di Tambahkan (<%- data.length %> Peserta)</h2>
+        <button style="margin-bottom: 20px; border:none" 
+        class="show-list-btn button primary">Show List</button>
+        <a href="/group/delete-all"><button style="margin-bottom: 20px; border:none" 
+        class="delete-list-btn button danger">Delete All List</button></a>
+
+        <% if (msg.length != 0) { %>
+            <div class="alert alert-success">
+                <%- msg %>
+            </div>
+          <% } %>
+        <div class="list-users">
+            
+           <% if (data.length < 1) { %>
+                <h3>❌ Maaf Data Kosong</h3>
+           <% } else { %>
+            <% data.forEach((user,index) => { %>
+                <div class="user alert">
+                   
+                       
+                         <li><strong> </strong><%- user.nama %> | <%- user.umur %> Tahun | <%- user.gender %>
+                            <br>
+                            <a  id="btnHapus" onclick="return confirm(`Apakah Yakin Ingin Menghapus Data ?`)" href="/group/delete/<%- user.nama %>"><strong>Hapus</strong></a> 
+                       
+                    
+                </div>
+                
+                <% }) %>
+            <% } %>
+    </div>
+    <hr>
+    <div class="grouped-contents ">
+        <form  method="post" action="/grouped"  class="grouped-option">
+            <label for="amount"><strong>Masukan Jumlah Group</strong> :</label><br>
+            <select name="amount" class="alert alert-info primary id="amount">
+                <% if (data.length < 4) { %>
+                    <option value="1">Data Minimal Harus 4</option>
+                   <% } else {%>
+                    <% for( let index = 2; index <= data.length / 2; index++ ) { %>
+             
+                        <option value="<%- index %>"><%- index %> Group</option>
+                       
+                     <% } %>
+                    <% } %>
+             
+            </select>
+            <button type="submit" class="button primary">Group It !</button>
+            <button style="margin-bottom: 20px; border:none" id="downloadButton"
+            class="download-list-btn button success">Download List</button>
+        </form>
+        <div class="grouped-container table-container">
+           
+            <% if (groupedDataJSON) { %>
+                <% groupedDataJSON.forEach((data,index) => { %>
+                    <table class="elegant-table"> 
+                        
+                           
+                              
+                                <thead>
+                                   
+        
+                                    <tr>
+                                        <h2>Group <%- index + 1 %></h2>
+                                        <th>Nomer</th>
+                                        <th>Nama</th>
+                                        <th>Usia</th>
+                                        <th>Gender</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                
+                                    
+                                    <% data.forEach((dt,index) => { %>
+                                        
+                                        <tr>
+                                        <td><%- index+1 %>.</td>
+                                        <td><%- dt.nama %></td>
+                                        <td><%- dt.umur %></td>
+                                        <td><%- dt.gender %></td>
+                                    </tr>
+                                    <% }) %>
+                                </tbody>               
+                    </table>
+                    <% }) %>
+            <% } %>
+
+            
+        </div>
+    </div>
+ </div>
+</div>
+<script>
+
+    const list = document.querySelector('.list-users')
+    const showListBtn = document.querySelector('.show-list-btn')
+    console.log(showListBtn)
+    showListBtn.addEventListener('click', () => {
+        if (list.style.display === 'none') {
+        list.style.display = 'flex';
+        showListBtn.classList.add('primary')
+        showListBtn.classList.remove('danger')
+        showListBtn.textContent = 'Hide List'
+        } else {
+        list.style.display = 'none';
+        showListBtn.textContent = 'Show List'
+        showListBtn.classList.add('danger')
+        showListBtn.classList.remove('primary')
+    }
+    })
+
+</script>
+
+<script>
+const downloadButton = document.getElementById('downloadButton');
+
+let dataMe = '<%- groupedDataJSON ? JSON.stringify(groupedDataJSON) : undefined %>';
+if (dataMe == '') {
+    downloadButton.style.display = 'none';
+}
+dataMe = JSON.parse(dataMe)
+let incret = 1;
+dataMe.map((data) => {
+    data.unshift({group : incret})
+   
+    incret++;
+})
+    // Mendapatkan referensi tombol download
+
+// Data array yang ingin Anda simpan dalam file teks
+let dataMine = JSON.stringify(dataMe, null, 3)
+
+
+
+// Fungsi untuk mengunduh file teks
+function downloadTextFile(event) {
+    event.preventDefault();
+
+    // Mengubah array menjadi string dengan pemisah baris baru
+    const textContent = dataMine;
+
+    // Membuat objek Blob dari teks
+    const blob = new Blob([textContent], { type: 'text/plain' });
+
+    // Membuat URL objek Blob
+    const url = URL.createObjectURL(blob);
+
+    // Membuat elemen tautan yang mengarahkan pada URL objek Blob
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'data-group.txt'; // Nama file yang akan diunduh
+    a.textContent = 'Download Text File';
+
+    // Memasang elemen tautan pada dokumen
+    document.body.appendChild(a);
+
+    // Mengklik elemen tautan untuk memulai unduhan
+    a.click();
+
+    // Menghapus elemen tautan dari dokumen
+    document.body.removeChild(a);
+}
+
+// Menambahkan event listener untuk tombol download
+downloadButton.addEventListener('click', downloadTextFile);
+
+</script>
+
+<%- include('layouts/footer.ejs') %>

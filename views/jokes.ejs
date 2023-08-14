@@ -1,0 +1,22 @@
+<%- include('layouts/header.ejs') %>
+<div class="contents jokes-container">
+    <h2>Dad Jokes Generator (Bahasa Indonesia)</h2>
+    <p>Sebuah Aplikasi Fetch Sederhana, ketika kalian menekan tombol generate akan memunculkan 
+        jokes bapak - bapak random, saya menggunakan API <i>(Application Programming Interface)</i> dari github <a target="_blank" href="https://github.com/ardhptr21/candaan-api/">ardhptr21 </a></p>
+    <div class="jokes-content">
+        <div class="jokes-gen">
+            <h3>Textual Jokes</h3>
+            <h3 class="text-jokes">"<%- textData %>"</h3>
+        </div>
+        <div class="jokes-gen">
+            <h3>Visual Jokes</h3>
+            <img style="border: 1px solid #dc3545;" src="<%- imgData.url %>" alt="">
+            <p><a target="_blank" href="<%- imgData.source %>">Image Source</a></p>
+            <a href="/jokes"><button class="elegant-button">Generate Ulang</button></a>
+        </div>
+    </div>
+</div>
+<script>
+
+</script>
+<%- include('layouts/footer.ejs') %>
